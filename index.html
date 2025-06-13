@@ -168,37 +168,106 @@
     </div>
 
     <script>
-        const randint = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        
-        // --- 問題生成関数群 ---
+        // --- 問題生成関数群 (重複を許さないように改良) ---
         const generateProblems = {
             addition: (options) => {
-                const problems = [];
-                for (let i = 0; i < options.single_single; i++) { const a = randint(1, 9), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
-                for (let i = 0; i < options.up_to_20_single; i++) { const a = randint(10, 20), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
-                for (let i = 0; i < options.up_to_40_up_to_40; i++) { const a = randint(10, 40), b = randint(10, 40); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
+                let problems = [];
+                // ひとけた＋ひとけた
+                if (options.single_single > 0) {
+                    const possible = [];
+                    const added = new Set();
+                    for (let a = 1; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
+                        const key = [a,b].sort().join(',');
+                        if (!added.has(key)) {
+                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b });
+                            added.add(key);
+                        }
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.single_single));
+                }
+                // 10から20まで+ひとけた
+                if (options.up_to_20_single > 0) {
+                    const possible = [];
+                    for (let a = 10; a <= 20; a++) { for (let b = 1; b <= 9; b++) {
+                        possible.push({ p: `${a} ＋ ${b} =`, a: a + b });
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_20_single));
+                }
+                // 10から40まで+10から40まで
+                if (options.up_to_40_up_to_40 > 0) {
+                    const possible = [];
+                    const added = new Set();
+                    for (let a = 10; a <= 40; a++) { for (let b = 10; b <= 40; b++) {
+                        const key = [a,b].sort().join(',');
+                        if (!added.has(key)) {
+                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b });
+                            added.add(key);
+                        }
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_40_up_to_40));
+                }
                 return problems;
             },
             subtraction: (options) => {
-                 const problems = [];
-                for (let i = 0; i < options.single_single; i++) { let a = randint(1, 9), b = randint(1, 9); if (a < b) [a, b] = [b, a]; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
-                for (let i = 0; i < options.up_to_20_single; i++) { let a = randint(10, 20), b = randint(1, 9); if (a <= b) continue; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
-                for (let i = 0; i < options.up_to_40_up_to_40; i++) { let a = randint(10, 40), b = randint(10, 40); if (a < b) [a, b] = [b, a]; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
+                let problems = [];
+                // ひとけた－ひとけた
+                if (options.single_single > 0) {
+                    const possible = [];
+                    for (let a = 1; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
+                        if (a > b) possible.push({ p: `${a} － ${b} =`, a: a - b });
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.single_single));
+                }
+                // 10から20まで－ひとけた
+                if (options.up_to_20_single > 0) {
+                    const possible = [];
+                    for (let a = 10; a <= 20; a++) { for (let b = 1; b <= 9; b++) {
+                         if (a > b) possible.push({ p: `${a} － ${b} =`, a: a - b });
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_20_single));
+                }
+                // 10から40まで－10から40まで
+                if (options.up_to_40_up_to_40 > 0) {
+                    const possible = [];
+                    for (let a = 10; a <= 40; a++) { for (let b = 10; b <= 40; b++) {
+                        if (a > b) possible.push({ p: `${a} － ${b} =`, a: a - b });
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_40_up_to_40));
+                }
                 return problems;
             },
             multiplication: (options) => {
-                const problems = [];
                 if (!options.tables.length || options.count === 0) return [];
-                for (let i = 0; i < options.count; i++) { const table = options.tables[randint(0, options.tables.length - 1)]; const multiplier = randint(1, 9); problems.push({ p: `${table} × ${multiplier} =`, a: table * multiplier });}
-                return problems;
+                const possible = [];
+                const added = new Set();
+                for (const table of options.tables) {
+                    for (let i = 1; i <= 9; i++) {
+                        const key = [table, i].sort().join(',');
+                        if (!added.has(key)) {
+                            possible.push({p: `${table} × ${i} =`, a: table * i});
+                            added.add(key);
+                        }
+                    }
+                }
+                return possible.sort(() => 0.5 - Math.random()).slice(0, options.count);
             },
             division: (options) => {
-                const problems = [];
-                for (let i = 0; i < options.kuku_range; i++) { const d = randint(2, 9), q = randint(1, 9); problems.push({ p: `${d * q} ÷ ${d} =`, a: q });}
-                for (let i = 0; i < options.up_to_99_single; i++) {
-                    const d = randint(2, 9);
-                    const q = randint(1, Math.floor(99 / d));
-                    problems.push({ p: `${d * q} ÷ ${d} =`, a: q });
+                let problems = [];
+                // 九九の範囲
+                if (options.kuku_range > 0) {
+                    const possible = [];
+                    for (let a = 2; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
+                        possible.push({ p: `${a * b} ÷ ${a} =`, a: b });
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.kuku_range));
+                }
+                // 99まで÷ひとけた
+                if (options.up_to_99_single > 0) {
+                    const possible = [];
+                    for (let a = 2; a <= 9; a++) { for (let b = 1; b <= Math.floor(99 / a); b++) {
+                        possible.push({ p: `${a * b} ÷ ${a} =`, a: b });
+                    }}
+                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_99_single));
                 }
                 return problems;
             }
@@ -212,7 +281,7 @@
             ctx.fillStyle = 'black';
             ctx.font = '20pt "Hiragino Kaku Gothic ProN", Meiryo, sans-serif';
             
-            let currentY = 60, xMargin = 50, lineHeight = 80, columnWidth = 400; // 行間を広げるためlineHeightを増やす
+            let currentY = 60, xMargin = 50, lineHeight = 80, columnWidth = 400;
 
             ctx.fillText(title, xMargin, currentY);
             currentY += lineHeight;
@@ -221,7 +290,6 @@
 
             for (let i = 0; i < problemList.length; i += 2) {
                 const p1 = problemList[i];
-                // 問題用紙では"="を消し、解答用紙では答えを表示する
                 const p1_text = showAnswers ? `${p1.p} ${p1.a}` : p1.p.replace(' =', '');
                 ctx.fillText(p1_text, xMargin, currentY);
 
@@ -230,7 +298,7 @@
                     const p2_text = showAnswers ? `${p2.p} ${p2.a}` : p2.p.replace(' =', '');
                     ctx.fillText(p2_text, xMargin + columnWidth, currentY);
                 }
-                currentY += lineHeight; // 次の行へ
+                currentY += lineHeight;
             }
         };
 
@@ -247,16 +315,21 @@
                 multiplication: { count: getInputValue('mul_count'), tables: getCheckedValues('mul_tables') },
                 division: { kuku_range: getInputValue('div_kuku'), up_to_99_single: getInputValue('div_u99s') }
             };
-
+            
+            let additionProblems = generateProblems.addition(config.addition);
+            let subtractionProblems = generateProblems.subtraction(config.subtraction);
+            let multiplicationProblems = generateProblems.multiplication(config.multiplication);
+            let divisionProblems = generateProblems.division(config.division);
+            
             let allProblems = [
-                ...generateProblems.addition(config.addition),
-                ...generateProblems.subtraction(config.subtraction),
-                ...generateProblems.multiplication(config.multiplication),
-                ...generateProblems.division(config.division),
+                ...additionProblems,
+                ...subtractionProblems,
+                ...multiplicationProblems,
+                ...divisionProblems,
             ];
 
             if (config.order === 'random') {
-                allProblems.sort(() => Math.random() - 0.5);
+                allProblems.sort(() => 0.5 - Math.random());
             }
             
             const today = new Date();
