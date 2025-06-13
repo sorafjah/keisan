@@ -70,20 +70,38 @@
             border: 1px solid #ccc;
             text-align: center;
         }
-        #generateBtn, .printBtn {
+        #generateBtn {
             width: 100%;
             padding: 12px;
             font-size: 1.1em;
             font-weight: bold;
+            background-color: #667eea;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 20px;
         }
-        #generateBtn { background-color: #667eea; }
         #generateBtn:hover { background-color: #5a67d8; }
-        .printBtn { background-color: #38a169; }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .actionBtn, .printBtn {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em; /* ボタン内のフォントサイズを少し調整 */
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .actionBtn { background-color: #667eea; } /* 表示ボタン */
+        .actionBtn:hover { background-color: #5a67d8; }
+        .printBtn { background-color: #38a169; } /* 印刷ボタン */
         .printBtn:hover { background-color: #2f855a; }
 
         canvas {
@@ -157,13 +175,18 @@
             <h2>🖨️ 計算プリント</h2>
             <div class="info">下のボタンで印刷できます。（合計24問まで)</div>
             <canvas id="worksheet-canvas" width="800" height="1100"></canvas>
-            <button class="printBtn" data-canvas-id="worksheet-canvas">このプリントを印刷する</button>
+            <div class="button-group">
+                 <button class="printBtn" id="printWorksheetBtn">このプリントを印刷する</button>
+            </div>
         </div>
         <div class="result-column">
             <h2>✅ こたえ</h2>
             <div class="info">こちらは答え合わせ用のプレビューです。</div>
             <canvas id="answer-canvas" width="800" height="1100"></canvas>
-            <button class="printBtn" data-canvas-id="answer-canvas">このこたえを印刷する</button>
+            <div class="button-group">
+                <button class="actionBtn" id="showAnswerBtn">答えを表示する</button>
+                <button class="printBtn" id="printAnswerBtn">答えを印刷する</button>
+            </div>
         </div>
     </div>
 
@@ -174,15 +197,11 @@
                 let problems = [];
                 // ひとけた＋ひとけた
                 if (options.single_single > 0) {
-                    const possible = [];
-                    const added = new Set();
+                    const possible = []; const added = new Set();
                     for (let a = 1; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
-                        const key = [a,b].sort().join(',');
-                        if (!added.has(key)) {
-                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b });
-                            added.add(key);
-                        }
-                    }}
+                        const key = [a,b].sort().join(','); if (!added.has(key)) {
+                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b }); added.add(key);
+                        }}}
                     problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.single_single));
                 }
                 // 10から20まで+ひとけた
@@ -195,15 +214,11 @@
                 }
                 // 10から40まで+10から40まで
                 if (options.up_to_40_up_to_40 > 0) {
-                    const possible = [];
-                    const added = new Set();
+                    const possible = []; const added = new Set();
                     for (let a = 10; a <= 40; a++) { for (let b = 10; b <= 40; b++) {
-                        const key = [a,b].sort().join(',');
-                        if (!added.has(key)) {
-                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b });
-                            added.add(key);
-                        }
-                    }}
+                        const key = [a,b].sort().join(','); if (!added.has(key)) {
+                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b }); added.add(key);
+                        }}}
                     problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_40_up_to_40));
                 }
                 return problems;
@@ -238,17 +253,12 @@
             },
             multiplication: (options) => {
                 if (!options.tables.length || options.count === 0) return [];
-                const possible = [];
-                const added = new Set();
+                const possible = []; const added = new Set();
                 for (const table of options.tables) {
                     for (let i = 1; i <= 9; i++) {
-                        const key = [table, i].sort().join(',');
-                        if (!added.has(key)) {
-                            possible.push({p: `${table} × ${i} =`, a: table * i});
-                            added.add(key);
-                        }
-                    }
-                }
+                        const key = [table, i].sort().join(','); if (!added.has(key)) {
+                            possible.push({p: `${table} × ${i} =`, a: table * i}); added.add(key);
+                        }}}
                 return possible.sort(() => 0.5 - Math.random()).slice(0, options.count);
             },
             division: (options) => {
@@ -316,16 +326,11 @@
                 division: { kuku_range: getInputValue('div_kuku'), up_to_99_single: getInputValue('div_u99s') }
             };
             
-            let additionProblems = generateProblems.addition(config.addition);
-            let subtractionProblems = generateProblems.subtraction(config.subtraction);
-            let multiplicationProblems = generateProblems.multiplication(config.multiplication);
-            let divisionProblems = generateProblems.division(config.division);
-            
             let allProblems = [
-                ...additionProblems,
-                ...subtractionProblems,
-                ...multiplicationProblems,
-                ...divisionProblems,
+                ...generateProblems.addition(config.addition),
+                ...generateProblems.subtraction(config.subtraction),
+                ...generateProblems.multiplication(config.multiplication),
+                ...generateProblems.division(config.division),
             ];
 
             if (config.order === 'random') {
@@ -350,29 +355,38 @@
         };
         
         // --- イベントリスナーの設定 ---
-        document.getElementById('generateBtn').addEventListener('click', generateAndRender);
-        
-        document.querySelectorAll('.printBtn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const canvasId = e.target.getAttribute('data-canvas-id');
-                const canvas = document.getElementById(canvasId);
-                const dataUrl = canvas.toDataURL('image/png');
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(`
-                    <html>
-                        <head><title>印刷プレビュー</title></head>
-                        <body style="text-align:center;">
-                            <img src="${dataUrl}" style="width:100%; max-width:800px;">
-                        </body>
-                    </html>`);
-                printWindow.document.close();
-                printWindow.onload = () => {
-                    printWindow.print();
-                    printWindow.close();
-                };
-            });
-        });
+        const printCanvas = (canvasId) => {
+            const canvas = document.getElementById(canvasId);
+            const dataUrl = canvas.toDataURL('image/png');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html><head><title>印刷プレビュー</title></head>
+                <body style="text-align:center;"><img src="${dataUrl}" style="width:100%; max-width:800px;"></body>
+                </html>`);
+            printWindow.document.close();
+            printWindow.onload = () => {
+                printWindow.print();
+                printWindow.close();
+            };
+        };
 
+        const showCanvas = (canvasId, title) => {
+            const canvas = document.getElementById(canvasId);
+            const dataUrl = canvas.toDataURL('image/png');
+            const viewWindow = window.open('', '_blank');
+            viewWindow.document.write(`
+                <html><head><title>${title}</title></head>
+                <body style="margin:0; text-align:center; background-color: #f0f0f0;">
+                <img src="${dataUrl}" style="max-width:100%; height:auto;"></body>
+                </html>`);
+            viewWindow.document.close();
+        };
+
+        document.getElementById('generateBtn').addEventListener('click', generateAndRender);
+        document.getElementById('printWorksheetBtn').addEventListener('click', () => printCanvas('worksheet-canvas'));
+        document.getElementById('printAnswerBtn').addEventListener('click', () => printCanvas('answer-canvas'));
+        document.getElementById('showAnswerBtn').addEventListener('click', () => showCanvas('answer-canvas', '答えの表示'));
+        
         // --- 初期表示 ---
         generateAndRender();
     </script>
