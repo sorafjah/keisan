@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>計算プリント作成アプリ (Canvas版)</title>
+    <title>計算プリント作成アプリ (改良版)</title>
     <style>
         body {
             font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
@@ -13,7 +13,7 @@
             background-color: #f4f4f9;
         }
         #sidebar {
-            width: 320px;
+            width: 350px; /* 少し幅を広げる */
             padding: 20px;
             background-color: #ffffff;
             border-right: 1px solid #ddd;
@@ -33,17 +33,20 @@
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
+            display: flex;
+            flex-direction: column;
         }
         h1, h2, h3 {
             color: #333;
             border-bottom: 2px solid #667eea;
             padding-bottom: 5px;
         }
-        h1 { font-size: 1.8em; }
+        h1 { font-size: 1.8em; margin-bottom: 20px;}
         h2 { font-size: 1.4em; margin-top: 0; }
-        h3 { font-size: 1.1em; color: #555; border-bottom: 1px solid #ccc; margin-top: 25px;}
+        h3 { font-size: 1.1em; color: #555; border-bottom: 1px solid #ccc; margin-top: 25px; padding-left: 10px; border-left: 5px solid #a3bffa;}
         .input-group {
             margin-bottom: 15px;
+            padding-left: 10px;
         }
         .input-group label {
             display: block;
@@ -51,32 +54,45 @@
             font-weight: bold;
             font-size: 0.9em;
         }
-        .input-group input[type="number"] {
-            width: 90%;
+        .input-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .input-item label {
+            flex: 1;
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+        .input-item input[type="number"] {
+            width: 60px;
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            text-align: center;
         }
-        #generateBtn {
+        #generateBtn, .printBtn {
             width: 100%;
             padding: 12px;
             font-size: 1.1em;
             font-weight: bold;
-            background-color: #667eea;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 20px;
         }
-        #generateBtn:hover {
-            background-color: #5a67d8;
-        }
+        #generateBtn { background-color: #667eea; }
+        #generateBtn:hover { background-color: #5a67d8; }
+        .printBtn { background-color: #38a169; }
+        .printBtn:hover { background-color: #2f855a; }
+
         canvas {
             border: 1px solid #ccc;
             background-color: #fff;
             width: 100%;
             height: auto;
+            flex-grow: 1;
         }
         .info {
             background-color: #eef2ff;
@@ -102,45 +118,38 @@
 
         <h3>たしざん</h3>
         <div class="input-group">
-            <label for="add_ss">ひとけた＋ひとけた</label>
-            <input type="number" id="add_ss" min="0" value="4">
-        </div>
-        <div class="input-group">
-            <label for="add_u20s">20まで+ひとけた</label>
-            <input type="number" id="add_u20s" min="0" value="0">
+            <div class="input-item"><label for="add_ss">ひとけた＋ひとけた</label><input type="number" id="add_ss" min="0" value="4"></div>
+            <div class="input-item"><label for="add_u20s">20まで+ひとけた</label><input type="number" id="add_u20s" min="0" value="0"></div>
+            <div class="input-item"><label for="add_u20u20">20まで+20まで</label><input type="number" id="add_u20u20" min="0" value="0"></div>
         </div>
 
         <h3>ひきざん</h3>
         <div class="input-group">
-            <label for="sub_ss">ひとけた－ひとけた</label>
-            <input type="number" id="sub_ss" min="0" value="2">
-        </div>
-        <div class="input-group">
-            <label for="sub_u20s">20まで－ひとけた</label>
-            <input type="number" id="sub_u20s" min="0" value="2">
+            <div class="input-item"><label for="sub_ss">ひとけた－ひとけた</label><input type="number" id="sub_ss" min="0" value="2"></div>
+            <div class="input-item"><label for="sub_u20s">20まで－ひとけた</label><input type="number" id="sub_u20s" min="0" value="2"></div>
+            <div class="input-item"><label for="sub_u20u20">20まで－20まで</label><input type="number" id="sub_u20u20" min="0" value="0"></div>
         </div>
 
         <h3>かけざん</h3>
         <div class="input-group">
-            <label for="mul_count">合計問題数</label>
-            <input type="number" id="mul_count" min="0" value="6">
-            <label style="margin-top: 10px;">対象の段 (複数選択可)</label>
-            <div id="mul_tables">
-                <input type="checkbox" id="table2" value="2" checked><label for="table2" style="display:inline-block;">2</label>
-                <input type="checkbox" id="table3" value="3" checked><label for="table3" style="display:inline-block;">3</label>
-                <input type="checkbox" id="table4" value="4" checked><label for="table4" style="display:inline-block;">4</label>
-                <input type="checkbox" id="table5" value="5" checked><label for="table5" style="display:inline-block;">5</label>
-                <input type="checkbox" id="table6" value="6" checked><label for="table6" style="display:inline-block;">6</label>
-                <input type="checkbox" id="table7" value="7" checked><label for="table7" style="display:inline-block;">7</label>
-                <input type="checkbox" id="table8" value="8" checked><label for="table8" style="display:inline-block;">8</label>
+            <div class="input-item"><label for="mul_count">合計問題数</label><input type="number" id="mul_count" min="0" value="6"></div>
+            <label style="margin-top: 10px; font-weight:normal;">対象の段 (複数選択可)</label>
+            <div id="mul_tables" style="font-size:0.9em;">
+                <input type="checkbox" id="table2" value="2" checked><label for="table2" style="display:inline-block; margin-right:5px;">2</label>
+                <input type="checkbox" id="table3" value="3" checked><label for="table3" style="display:inline-block; margin-right:5px;">3</label>
+                <input type="checkbox" id="table4" value="4" checked><label for="table4" style="display:inline-block; margin-right:5px;">4</label>
+                <input type="checkbox" id="table5" value="5" checked><label for="table5" style="display:inline-block; margin-right:5px;">5</label>
+                <input type="checkbox" id="table6" value="6" checked><label for="table6" style="display:inline-block; margin-right:5px;">6</label>
+                <input type="checkbox" id="table7" value="7" checked><label for="table7" style="display:inline-block; margin-right:5px;">7</label>
+                <input type="checkbox" id="table8" value="8" checked><label for="table8" style="display:inline-block; margin-right:5px;">8</label>
                 <input type="checkbox" id="table9" value="9" checked><label for="table9" style="display:inline-block;">9</label>
             </div>
         </div>
         
-        <h3>わりざん</h3>
+        <h3>わりざん (あまりなし)</h3>
         <div class="input-group">
-            <label for="div_kuku">かけざん九九の範囲内</label>
-            <input type="number" id="div_kuku" min="0" value="4">
+            <div class="input-item"><label for="div_kuku">かけざん九九の範囲内</label><input type="number" id="div_kuku" min="0" value="4"></div>
+            <div class="input-item"><label for="div_u99s">99まで÷ひとけた</label><input type="number" id="div_u99s" min="0" value="0"></div>
         </div>
         
         <button id="generateBtn">計算プリントを作成</button>
@@ -149,152 +158,151 @@
     <div id="main-content">
         <div class="result-column">
             <h2>🖨️ 計算プリント</h2>
-            <div class="info">プレビュー上で右クリックし、「名前を付けて画像を保存」で保存できます。</div>
+            <div class="info">プレビュー上で右クリックして画像を保存するか、下のボタンで印刷できます。</div>
             <canvas id="worksheet-canvas" width="800" height="1100"></canvas>
+            <button class="printBtn" data-canvas-id="worksheet-canvas">このプリントを印刷する</button>
         </div>
         <div class="result-column">
             <h2>✅ こたえ</h2>
-             <div class="info">こちらは答え合わせ用のプレビューです。</div>
+            <div class="info">こちらは答え合わせ用のプレビューです。</div>
             <canvas id="answer-canvas" width="800" height="1100"></canvas>
+            <button class="printBtn" data-canvas-id="answer-canvas">このこたえを印刷する</button>
         </div>
     </div>
 
     <script>
-        // --- 共通の関数（前回から変更なし）---
         const randint = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        // (問題生成関数群は長いため、下部のメインロジック内にまとめます)
+        
+        // --- 問題生成関数群 ---
+        const generateProblems = {
+            addition: (options) => {
+                const problems = [];
+                for (let i = 0; i < options.single_single; i++) { const a = randint(1, 9), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
+                for (let i = 0; i < options.up_to_20_single; i++) { const a = randint(1, 20), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
+                for (let i = 0; i < options.up_to_20_up_to_20; i++) { const a = randint(1, 20), b = randint(1, 20); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
+                return problems;
+            },
+            subtraction: (options) => {
+                 const problems = [];
+                for (let i = 0; i < options.single_single; i++) { let a = randint(1, 9), b = randint(1, 9); if (a < b) [a, b] = [b, a]; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
+                for (let i = 0; i < options.up_to_20_single; i++) { let a = randint(1, 20), b = randint(1, 9); if (a <= b) continue; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
+                for (let i = 0; i < options.up_to_20_up_to_20; i++) { let a = randint(1, 20), b = randint(1, 20); if (a < b) [a, b] = [b, a]; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
+                return problems;
+            },
+            multiplication: (options) => {
+                const problems = [];
+                if (!options.tables.length || options.count === 0) return [];
+                for (let i = 0; i < options.count; i++) { const table = options.tables[randint(0, options.tables.length - 1)]; const multiplier = randint(1, 9); problems.push({ p: `${table} × ${multiplier} =`, a: table * multiplier });}
+                return problems;
+            },
+            division: (options) => {
+                const problems = [];
+                for (let i = 0; i < options.kuku_range; i++) { const d = randint(2, 9), q = randint(1, 9); problems.push({ p: `${d * q} ÷ ${d} =`, a: q });}
+                for (let i = 0; i < options.up_to_99_single; i++) {
+                    const d = randint(2, 9);
+                    const q = randint(1, Math.floor(99 / d));
+                    problems.push({ p: `${d * q} ÷ ${d} =`, a: q });
+                }
+                return problems;
+            }
+        };
 
-        // --- Canvasに描画する関数 ---
         const renderToCanvas = (canvasId, title, problemList, showAnswers) => {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
-
-            // Canvasをクリア
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // 描画設定
             ctx.fillStyle = 'black';
             ctx.font = '20pt "Hiragino Kaku Gothic ProN", Meiryo, sans-serif';
             
-            // 描画位置の初期設定
-            let currentY = 50; // 上マージン
-            const xMargin = 40;
-            const lineHeight = 50; // 行の高さ
-            const columnWidth = 400; // 2列目の開始位置
+            let currentY = 50, xMargin = 40, lineHeight = 50, columnWidth = 400;
 
-            // タイトルと名前欄を描画
             ctx.fillText(title, xMargin, currentY);
             currentY += lineHeight;
             ctx.fillText('なまえ（　　　　　　　　　　　　）', xMargin, currentY);
-            currentY += lineHeight * 1.5; // 問題との間にスペース
+            currentY += lineHeight * 1.5;
 
-            // 問題を描画
             for (let i = 0; i < problemList.length; i += 2) {
-                // 1列目
                 const p1 = problemList[i];
-                const p1_text = showAnswers ? `${p1.problem} ${p1.answer}` : p1.problem;
+                const p1_text = showAnswers ? `${p1.p} ${p1.a}` : p1.p;
                 ctx.fillText(p1_text, xMargin, currentY);
 
-                // 2列目 (問題があれば)
                 if (i + 1 < problemList.length) {
                     const p2 = problemList[i+1];
-                    const p2_text = showAnswers ? `${p2.problem} ${p2.answer}` : p2.problem;
+                    const p2_text = showAnswers ? `${p2.p} ${p2.a}` : p2.p;
                     ctx.fillText(p2_text, xMargin + columnWidth, currentY);
                 }
                 currentY += lineHeight;
             }
         };
 
-
-        // --- メインロジック ---
-        document.getElementById('generateBtn').addEventListener('click', () => {
-            
-            // --- 問題生成関数 ---
-            const generateAddition = (options) => { /* 省略 (前回と同じ) */ 
-                const problems = [];
-                for (let i = 0; i < options.single_single; i++) { const a = randint(1, 9), b = randint(1, 9); problems.push({ problem: `${a} ＋ ${b} =`, answer: a + b }); }
-                for (let i = 0; i < options.up_to_20_single; i++) { const a = randint(1, 20), b = randint(1, 9); problems.push({ problem: `${a} ＋ ${b} =`, answer: a + b }); }
-                return problems;
-            };
-            const generateSubtraction = (options) => { /* 省略 (前回と同じ) */ 
-                 const problems = [];
-                for (let i = 0; i < options.single_single; i++) { let a = randint(1, 9), b = randint(1, 9); if (a < b) [a, b] = [b, a]; problems.push({ problem: `${a} － ${b} =`, answer: a - b }); }
-                for (let i = 0; i < options.up_to_20_single; i++) { let a = randint(1, 20), b = randint(1, 9); if (a < b) continue; problems.push({ problem: `${a} － ${b} =`, answer: a - b }); }
-                return problems;
-            };
-            const generateMultiplication = (options) => { /* 省略 (前回と同じ) */ 
-                const problems = [];
-                if (!options.tables.length || options.count === 0) return [];
-                for (let i = 0; i < options.count; i++) { const table = options.tables[randint(0, options.tables.length - 1)]; const multiplier = randint(1, 9); problems.push({ problem: `${table} × ${multiplier} =`, answer: table * multiplier });}
-                return problems;
-            };
-            const generateDivision = (options) => { /* 省略 (前回と同じ) */ 
-                const problems = [];
-                for (let i = 0; i < options.kuku_range; i++) { const divisor = randint(2, 9), quotient = randint(1, 9); const dividend = divisor * quotient; problems.push({ problem: `${dividend} ÷ ${divisor} =`, answer: quotient });}
-                return problems;
-            };
-
-            // ユーザーの入力を取得
+        const generateAndRender = () => {
             const getInputValue = (id) => parseInt(document.getElementById(id).value, 10) || 0;
             const getCheckedValues = (containerId) => {
-                const checked = [];
-                document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`).forEach(el => {
-                    checked.push(parseInt(el.value, 10));
-                });
-                return checked;
+                return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(el => parseInt(el.value, 10));
             };
 
             const config = {
                 order: document.querySelector('input[name="order"]:checked').value,
-                addition: { single_single: getInputValue('add_ss'), up_to_20_single: getInputValue('add_u20s') },
-                subtraction: { single_single: getInputValue('sub_ss'), up_to_20_single: getInputValue('sub_u20s') },
+                addition: { single_single: getInputValue('add_ss'), up_to_20_single: getInputValue('add_u20s'), up_to_20_up_to_20: getInputValue('add_u20u20') },
+                subtraction: { single_single: getInputValue('sub_ss'), up_to_20_single: getInputValue('sub_u20s'), up_to_20_up_to_20: getInputValue('sub_u20u20') },
                 multiplication: { count: getInputValue('mul_count'), tables: getCheckedValues('mul_tables') },
-                division: { kuku_range: getInputValue('div_kuku') }
+                division: { kuku_range: getInputValue('div_kuku'), up_to_99_single: getInputValue('div_u99s') }
             };
 
-            // 問題を作成
-            let allProblems = [];
-            allProblems.push(...generateAddition(config.addition));
-            allProblems.push(...generateSubtraction(config.subtraction));
-            allProblems.push(...generateMultiplication(config.multiplication));
-            allProblems.push(...generateDivision(config.division));
+            let allProblems = [
+                ...generateProblems.addition(config.addition),
+                ...generateProblems.subtraction(config.subtraction),
+                ...generateProblems.multiplication(config.multiplication),
+                ...generateProblems.division(config.division),
+            ];
 
             if (config.order === 'random') {
-                for (let i = allProblems.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [allProblems[i], allProblems[j]] = [allProblems[j], allProblems[i]];
-                }
+                allProblems.sort(() => Math.random() - 0.5);
             }
             
-            // 日付でタイトルを作成
             const today = new Date();
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const day = today.getDate().toString().padStart(2, '0');
-            const title = `計算プリント ${month}${day}`;
+            const title = `計算プリント ${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
             if(allProblems.length === 0){
-                // 問題数が0の場合の処理
-                const canvasW = document.getElementById('worksheet-canvas');
-                const ctxW = canvasW.getContext('2d');
-                ctxW.clearRect(0, 0, canvasW.width, canvasW.height);
-                ctxW.font = '16pt Meiryo';
-                ctxW.fillText('問題数を設定してください。', 50, 50);
-
-                const canvasA = document.getElementById('answer-canvas');
-                const ctxA = canvasA.getContext('2d');
-                ctxA.clearRect(0, 0, canvasA.width, canvasA.height);
+                const canvas = document.getElementById('worksheet-canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = '16pt Meiryo';
+                ctx.fillText('問題数を設定してください。', 50, 50);
+                document.getElementById('answer-canvas').getContext('2d').clearRect(0,0,800,1100);
                 return;
             }
 
-            // Canvasに描画
             renderToCanvas('worksheet-canvas', title, allProblems, false);
             renderToCanvas('answer-canvas', `${title} こたえ`, allProblems, true);
+        };
+        
+        // --- イベントリスナーの設定 ---
+        document.getElementById('generateBtn').addEventListener('click', generateAndRender);
+        
+        document.querySelectorAll('.printBtn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const canvasId = e.target.getAttribute('data-canvas-id');
+                const canvas = document.getElementById(canvasId);
+                const dataUrl = canvas.toDataURL('image/png');
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head><title>印刷プレビュー</title></head>
+                        <body style="text-align:center;">
+                            <img src="${dataUrl}" style="width:100%; max-width:800px;">
+                        </body>
+                    </html>`);
+                printWindow.document.close();
+                printWindow.onload = () => {
+                    printWindow.print();
+                };
+            });
         });
 
-        // 初期表示
-        document.getElementById('generateBtn').click();
+        // --- 初期表示 ---
+        generateAndRender();
     </script>
-
 </body>
 </html>
