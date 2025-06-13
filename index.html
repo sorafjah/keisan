@@ -116,14 +116,14 @@
         <h3>たしざん</h3>
         <div class="input-group">
             <div class="input-item"><label for="add_ss">ひとけた＋ひとけた</label><input type="number" id="add_ss" min="0" value="4"></div>
-            <div class="input-item"><label for="add_u20s">20まで+ひとけた</label><input type="number" id="add_u20s" min="0" value="0"></div>
+            <div class="input-item"><label for="add_u20s">10から20まで+ひとけた</label><input type="number" id="add_u20s" min="0" value="0"></div>
             <div class="input-item"><label for="add_u40u40">10から40まで+10から40まで</label><input type="number" id="add_u40u40" min="0" value="0"></div>
         </div>
 
         <h3>ひきざん</h3>
         <div class="input-group">
             <div class="input-item"><label for="sub_ss">ひとけた－ひとけた</label><input type="number" id="sub_ss" min="0" value="2"></div>
-            <div class="input-item"><label for="sub_u20s">20まで－ひとけた</label><input type="number" id="sub_u20s" min="0" value="2"></div>
+            <div class="input-item"><label for="sub_u20s">10から20まで－ひとけた</label><input type="number" id="sub_u20s" min="0" value="2"></div>
             <div class="input-item"><label for="sub_u40u40">10から40まで－10から40まで</label><input type="number" id="sub_u40u40" min="0" value="0"></div>
         </div>
 
@@ -175,14 +175,14 @@
             addition: (options) => {
                 const problems = [];
                 for (let i = 0; i < options.single_single; i++) { const a = randint(1, 9), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
-                for (let i = 0; i < options.up_to_20_single; i++) { const a = randint(1, 20), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
+                for (let i = 0; i < options.up_to_20_single; i++) { const a = randint(10, 20), b = randint(1, 9); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
                 for (let i = 0; i < options.up_to_40_up_to_40; i++) { const a = randint(10, 40), b = randint(10, 40); problems.push({ p: `${a} ＋ ${b} =`, a: a + b }); }
                 return problems;
             },
             subtraction: (options) => {
                  const problems = [];
                 for (let i = 0; i < options.single_single; i++) { let a = randint(1, 9), b = randint(1, 9); if (a < b) [a, b] = [b, a]; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
-                for (let i = 0; i < options.up_to_20_single; i++) { let a = randint(1, 20), b = randint(1, 9); if (a <= b) continue; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
+                for (let i = 0; i < options.up_to_20_single; i++) { let a = randint(10, 20), b = randint(1, 9); if (a <= b) continue; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
                 for (let i = 0; i < options.up_to_40_up_to_40; i++) { let a = randint(10, 40), b = randint(10, 40); if (a < b) [a, b] = [b, a]; problems.push({ p: `${a} － ${b} =`, a: a - b }); }
                 return problems;
             },
