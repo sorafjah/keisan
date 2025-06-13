@@ -215,24 +215,25 @@
             ctx.fillStyle = 'black';
             ctx.font = '20pt "Hiragino Kaku Gothic ProN", Meiryo, sans-serif';
             
-            let currentY = 50, xMargin = 40, lineHeight = 50, columnWidth = 400;
+            let currentY = 60, xMargin = 50, lineHeight = 80, columnWidth = 400; // 行間を広げるためlineHeightを増やす
 
             ctx.fillText(title, xMargin, currentY);
             currentY += lineHeight;
             ctx.fillText('なまえ（　　　　　　　　　　　　）', xMargin, currentY);
-            currentY += lineHeight * 1.5;
+            currentY += lineHeight;
 
             for (let i = 0; i < problemList.length; i += 2) {
                 const p1 = problemList[i];
-                const p1_text = showAnswers ? `${p1.p} ${p1.a}` : p1.p;
+                // 問題用紙では"="を消し、解答用紙では答えを表示する
+                const p1_text = showAnswers ? `${p1.p} ${p1.a}` : p1.p.replace(' =', '');
                 ctx.fillText(p1_text, xMargin, currentY);
 
                 if (i + 1 < problemList.length) {
                     const p2 = problemList[i+1];
-                    const p2_text = showAnswers ? `${p2.p} ${p2.a}` : p2.p;
+                    const p2_text = showAnswers ? `${p2.p} ${p2.a}` : p2.p.replace(' =', '');
                     ctx.fillText(p2_text, xMargin + columnWidth, currentY);
                 }
-                currentY += lineHeight;
+                currentY += lineHeight; // 次の行へ
             }
         };
 
@@ -297,6 +298,7 @@
                 printWindow.document.close();
                 printWindow.onload = () => {
                     printWindow.print();
+                    printWindow.close();
                 };
             });
         });
