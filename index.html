@@ -314,22 +314,25 @@
             ctx.fillStyle = 'black';
             ctx.font = '20pt "Hiragino Kaku Gothic ProN", Meiryo, sans-serif';
             
-            let currentY = 80, xMargin = 50, lineHeight = 100, columnWidth = 400; // 行間を調整
+            let currentY = 80, xMargin = 50, lineHeight = 100, columnWidth = 400;
+            const leftColumnX = xMargin + 60; // 左の列を3文字分右にずらす
+            const rightColumnX = xMargin + columnWidth; // 右の列は元の位置を維持
 
-            ctx.fillText(title, xMargin, currentY);
+            // タイトルと名前欄も左の列に合わせる
+            ctx.fillText(title, leftColumnX, currentY);
             currentY += lineHeight;
-            ctx.fillText('なまえ（　　　　　　　　　　　　）', xMargin, currentY);
+            ctx.fillText('なまえ（　　　　　　　　　　　　）', leftColumnX, currentY);
             currentY += lineHeight;
 
             for (let i = 0; i < problemList.length; i += 2) {
                 const p1 = problemList[i];
                 const p1_text = showAnswers ? `${p1.p} ${p1.a}` : p1.p.replace(' =', '');
-                ctx.fillText(p1_text, xMargin, currentY);
+                ctx.fillText(p1_text, leftColumnX, currentY);
 
                 if (i + 1 < problemList.length) {
                     const p2 = problemList[i+1];
                     const p2_text = showAnswers ? `${p2.p} ${p2.a}` : p2.p.replace(' =', '');
-                    ctx.fillText(p2_text, xMargin + columnWidth, currentY);
+                    ctx.fillText(p2_text, rightColumnX, currentY);
                 }
                 currentY += lineHeight;
             }
