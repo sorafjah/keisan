@@ -19,6 +19,7 @@
             border-right: 1px solid #ddd;
             overflow-y: auto;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            position: relative;
         }
         #main-content {
             flex-grow: 1;
@@ -80,7 +81,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 10px; /* 位置を調整 */
         }
         #generateBtn:hover { background-color: #5a67d8; }
         
@@ -118,6 +119,50 @@
             margin-bottom: 20px;
             border-radius: 0 5px 5px 0;
         }
+        
+        /* --- かわいいアラート用のスタイル --- */
+        #cute-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fffbe6;
+            border: 2px solid #f6e05e;
+            color: #b7791f;
+            padding: 25px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-align: center;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #cute-alert p {
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        #cute-alert button {
+            background-color: #f6e05e;
+            border: none;
+            color: #b7791f;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+            pointer-events: none;
+        }
+        #total-counter {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -133,21 +178,21 @@
 
         <h3>たしざん</h3>
         <div class="input-group">
-            <div class="input-item"><label for="add_ss">ひとけた＋ひとけた</label><input type="number" id="add_ss" min="0" value="4"></div>
-            <div class="input-item"><label for="add_u20s">10から20まで+ひとけた</label><input type="number" id="add_u20s" min="0" value="0"></div>
-            <div class="input-item"><label for="add_u40u40">10から40まで+10から40まで</label><input type="number" id="add_u40u40" min="0" value="0"></div>
+            <div class="input-item"><label for="add_ss">ひとけた＋ひとけた</label><input type="number" id="add_ss" class="q-input" min="0" value="4"></div>
+            <div class="input-item"><label for="add_u20s">10から20まで+ひとけた</label><input type="number" id="add_u20s" class="q-input" min="0" value="0"></div>
+            <div class="input-item"><label for="add_u40u40">10から40まで+10から40まで</label><input type="number" id="add_u40u40" class="q-input" min="0" value="0"></div>
         </div>
 
         <h3>ひきざん</h3>
         <div class="input-group">
-            <div class="input-item"><label for="sub_ss">ひとけた－ひとけた</label><input type="number" id="sub_ss" min="0" value="2"></div>
-            <div class="input-item"><label for="sub_u20s">10から20まで－ひとけた</label><input type="number" id="sub_u20s" min="0" value="2"></div>
-            <div class="input-item"><label for="sub_u40u40">10から40まで－10から40まで</label><input type="number" id="sub_u40u40" min="0" value="0"></div>
+            <div class="input-item"><label for="sub_ss">ひとけた－ひとけた</label><input type="number" id="sub_ss" class="q-input" min="0" value="2"></div>
+            <div class="input-item"><label for="sub_u20s">10から20まで－ひとけた</label><input type="number" id="sub_u20s" class="q-input" min="0" value="2"></div>
+            <div class="input-item"><label for="sub_u40u40">10から40まで－10から40まで</label><input type="number" id="sub_u40u40" class="q-input" min="0" value="0"></div>
         </div>
 
         <h3>かけざん</h3>
         <div class="input-group">
-            <div class="input-item"><label for="mul_count">合計問題数</label><input type="number" id="mul_count" min="0" value="6"></div>
+            <div class="input-item"><label for="mul_count">合計問題数</label><input type="number" id="mul_count" class="q-input" min="0" value="6"></div>
             <label style="margin-top: 10px; font-weight:normal;">対象の段 (複数選択可)</label>
             <div id="mul_tables" style="font-size:0.9em;">
                 <input type="checkbox" id="table2" value="2" checked><label for="table2" style="display:inline-block; margin-right:5px;">2</label>
@@ -163,10 +208,11 @@
         
         <h3>わりざん (あまりなし)</h3>
         <div class="input-group">
-            <div class="input-item"><label for="div_kuku">かけざん九九の範囲内</label><input type="number" id="div_kuku" min="0" value="4"></div>
-            <div class="input-item"><label for="div_u99s">99まで÷ひとけた</label><input type="number" id="div_u99s" min="0" value="0"></div>
+            <div class="input-item"><label for="div_kuku">かけざん九九の範囲内</label><input type="number" id="div_kuku" class="q-input" min="0" value="4"></div>
+            <div class="input-item"><label for="div_u99s">99まで÷ひとけた</label><input type="number" id="div_u99s" class="q-input" min="0" value="0"></div>
         </div>
         
+        <div id="total-counter">合計問題数: 18問</div>
         <button id="generateBtn">計算プリントを作成</button>
     </div>
 
@@ -189,197 +235,102 @@
             </div>
         </div>
     </div>
+    
+    <!-- かわいいアラート用のHTML -->
+    <div id="cute-alert" class="hidden">
+        <p>もんだいが おおすぎるみたい！<br><span style="font-size: 0.8em;">(合計24問までにしてね)</span></p>
+        <button id="close-alert-btn">OK</button>
+    </div>
+
 
     <script>
-        // --- 問題生成関数群 (重複を許さないように改良) ---
+        // --- 問題生成関数群 (変更なし) ---
         const generateProblems = {
-            addition: (options) => {
-                let problems = [];
-                // ひとけた＋ひとけた
-                if (options.single_single > 0) {
-                    const possible = []; const added = new Set();
-                    for (let a = 1; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
-                        const key = [a,b].sort().join(','); if (!added.has(key)) {
-                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b }); added.add(key);
-                        }}}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.single_single));
-                }
-                // 10から20まで+ひとけた
-                if (options.up_to_20_single > 0) {
-                    const possible = [];
-                    for (let a = 10; a <= 20; a++) { for (let b = 1; b <= 9; b++) {
-                        possible.push({ p: `${a} ＋ ${b} =`, a: a + b });
-                    }}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_20_single));
-                }
-                // 10から40まで+10から40まで
-                if (options.up_to_40_up_to_40 > 0) {
-                    const possible = []; const added = new Set();
-                    for (let a = 10; a <= 40; a++) { for (let b = 10; b <= 40; b++) {
-                        const key = [a,b].sort().join(','); if (!added.has(key)) {
-                            possible.push({ p: `${a} ＋ ${b} =`, a: a + b }); added.add(key);
-                        }}}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_40_up_to_40));
-                }
-                return problems;
-            },
-            subtraction: (options) => {
-                let problems = [];
-                // ひとけた－ひとけた
-                if (options.single_single > 0) {
-                    const possible = [];
-                    for (let a = 1; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
-                        if (a > b) possible.push({ p: `${a} － ${b} =`, a: a - b });
-                    }}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.single_single));
-                }
-                // 10から20まで－ひとけた
-                if (options.up_to_20_single > 0) {
-                    const possible = [];
-                    for (let a = 10; a <= 20; a++) { for (let b = 1; b <= 9; b++) {
-                         if (a > b) possible.push({ p: `${a} － ${b} =`, a: a - b });
-                    }}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_20_single));
-                }
-                // 10から40まで－10から40まで
-                if (options.up_to_40_up_to_40 > 0) {
-                    const possible = [];
-                    for (let a = 10; a <= 40; a++) { for (let b = 10; b <= 40; b++) {
-                        if (a > b) possible.push({ p: `${a} － ${b} =`, a: a - b });
-                    }}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_40_up_to_40));
-                }
-                return problems;
-            },
-            multiplication: (options) => {
-                if (!options.tables.length || options.count === 0) return [];
-                const possible = []; const added = new Set();
-                for (const table of options.tables) {
-                    for (let i = 1; i <= 9; i++) {
-                        const key = [table, i].sort().join(','); if (!added.has(key)) {
-                            possible.push({p: `${table} × ${i} =`, a: table * i}); added.add(key);
-                        }}}
-                return possible.sort(() => 0.5 - Math.random()).slice(0, options.count);
-            },
-            division: (options) => {
-                let problems = [];
-                // 九九の範囲
-                if (options.kuku_range > 0) {
-                    const possible = [];
-                    for (let a = 2; a <= 9; a++) { for (let b = 1; b <= 9; b++) {
-                        possible.push({ p: `${a * b} ÷ ${a} =`, a: b });
-                    }}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.kuku_range));
-                }
-                // 99まで÷ひとけた
-                if (options.up_to_99_single > 0) {
-                    const possible = [];
-                    for (let a = 2; a <= 9; a++) { for (let b = 1; b <= Math.floor(99 / a); b++) {
-                        possible.push({ p: `${a * b} ÷ ${a} =`, a: b });
-                    }}
-                    problems.push(...possible.sort(() => 0.5 - Math.random()).slice(0, options.up_to_99_single));
-                }
-                return problems;
-            }
+            addition: (options) => { let p=[];if(options.single_single>0){const poss=[],add=new Set();for(let a=1;a<=9;a++){for(let b=1;b<=9;b++){const k=[a,b].sort().join(',');if(!add.has(k)){poss.push({p:`${a} ＋ ${b} =`,a:a+b});add.add(k)}}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.single_single))}if(options.up_to_20_single>0){const poss=[];for(let a=10;a<=20;a++){for(let b=1;b<=9;b++){poss.push({p:`${a} ＋ ${b} =`,a:a+b})}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.up_to_20_single))}if(options.up_to_40_up_to_40>0){const poss=[],add=new Set();for(let a=10;a<=40;a++){for(let b=10;b<=40;b++){const k=[a,b].sort().join(',');if(!add.has(k)){poss.push({p:`${a} ＋ ${b} =`,a:a+b});add.add(k)}}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.up_to_40_up_to_40))}return p },
+            subtraction: (options) => { let p=[];if(options.single_single>0){const poss=[];for(let a=1;a<=9;a++){for(let b=1;b<=9;b++){if(a>b)poss.push({p:`${a} － ${b} =`,a:a-b})}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.single_single))}if(options.up_to_20_single>0){const poss=[];for(let a=10;a<=20;a++){for(let b=1;b<=9;b++){if(a>b)poss.push({p:`${a} － ${b} =`,a:a-b})}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.up_to_20_single))}if(options.up_to_40_up_to_40>0){const poss=[];for(let a=10;a<=40;a++){for(let b=10;b<=40;b++){if(a>b)poss.push({p:`${a} － ${b} =`,a:a-b})}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.up_to_40_up_to_40))}return p },
+            multiplication: (options) => { if(!options.tables.length||options.count===0)return[];const poss=[],add=new Set();for(const t of options.tables){for(let i=1;i<=9;i++){const k=[t,i].sort().join(',');if(!add.has(k)){poss.push({p:`${t} × ${i} =`,a:t*i});add.add(k)}}}return poss.sort(()=>0.5-Math.random()).slice(0,options.count)},
+            division: (options) => { let p=[];if(options.kuku_range>0){const poss=[];for(let a=2;a<=9;a++){for(let b=1;b<=9;b++){poss.push({p:`${a*b} ÷ ${a} =`,a:b})}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.kuku_range))}if(options.up_to_99_single>0){const poss=[];for(let a=2;a<=9;a++){for(let b=1;b<=Math.floor(99/a);b++){poss.push({p:`${a*b} ÷ ${a} =`,a:b})}}p.push(...poss.sort(()=>0.5-Math.random()).slice(0,options.up_to_99_single))}return p }
         };
 
         const renderToCanvas = (canvasId, title, problemList, showAnswers) => {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'black';
-            ctx.font = '20pt "Hiragino Kaku Gothic ProN", Meiryo, sans-serif';
-            
-            let currentY = 60, xMargin = 50, lineHeight = 80, columnWidth = 400;
-
-            ctx.fillText(title, xMargin, currentY);
-            currentY += lineHeight;
-            ctx.fillText('なまえ（　　　　　　　　　　　　）', xMargin, currentY);
-            currentY += lineHeight;
-
-            for (let i = 0; i < problemList.length; i += 2) {
-                const p1 = problemList[i];
-                const p1_text = showAnswers ? `${p1.p} ${p1.a}` : p1.p.replace(' =', '');
-                ctx.fillText(p1_text, xMargin, currentY);
-
-                if (i + 1 < problemList.length) {
-                    const p2 = problemList[i+1];
-                    const p2_text = showAnswers ? `${p2.p} ${p2.a}` : p2.p.replace(' =', '');
-                    ctx.fillText(p2_text, xMargin + columnWidth, currentY);
+            ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black'; ctx.font = '20pt "Hiragino Kaku Gothic ProN", Meiryo, sans-serif';
+            let y=60, x=50, lh=80, cw=400;
+            ctx.fillText(title, x, y); y+=lh;
+            ctx.fillText('なまえ（　　　　　　　　　　　　）', x, y); y+=lh;
+            for (let i=0; i<problemList.length; i+=2) {
+                const p1=problemList[i], p1t=showAnswers?`${p1.p} ${p1.a}`:p1.p.replace(' =','');
+                ctx.fillText(p1t, x, y);
+                if (i+1 < problemList.length) {
+                    const p2=problemList[i+1], p2t=showAnswers?`${p2.p} ${p2.a}`:p2.p.replace(' =','');
+                    ctx.fillText(p2t, x+cw, y);
                 }
-                currentY += lineHeight;
+                y+=lh;
             }
         };
 
         const generateAndRender = () => {
-            const getInputValue = (id) => parseInt(document.getElementById(id).value, 10) || 0;
-            const getCheckedValues = (containerId) => {
-                return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(el => parseInt(el.value, 10));
-            };
-
-            const config = {
+            const getVal = (id) => parseInt(document.getElementById(id).value,10)||0;
+            const getChecks = (cid) => Array.from(document.querySelectorAll(`#${cid} input:checked`)).map(el=>parseInt(el.value,10));
+            const cfg = {
                 order: document.querySelector('input[name="order"]:checked').value,
-                addition: { single_single: getInputValue('add_ss'), up_to_20_single: getInputValue('add_u20s'), up_to_40_up_to_40: getInputValue('add_u40u40') },
-                subtraction: { single_single: getInputValue('sub_ss'), up_to_20_single: getInputValue('sub_u20s'), up_to_40_up_to_40: getInputValue('sub_u40u40') },
-                multiplication: { count: getInputValue('mul_count'), tables: getCheckedValues('mul_tables') },
-                division: { kuku_range: getInputValue('div_kuku'), up_to_99_single: getInputValue('div_u99s') }
+                addition: {single_single:getVal('add_ss'),up_to_20_single:getVal('add_u20s'),up_to_40_up_to_40:getVal('add_u40u40')},
+                subtraction: {single_single:getVal('sub_ss'),up_to_20_single:getVal('sub_u20s'),up_to_40_up_to_40:getVal('sub_u40u40')},
+                multiplication: {count:getVal('mul_count'),tables:getChecks('mul_tables')},
+                division: {kuku_range:getVal('div_kuku'),up_to_99_single:getVal('div_u99s')}
             };
-            
-            let allProblems = [
-                ...generateProblems.addition(config.addition),
-                ...generateProblems.subtraction(config.subtraction),
-                ...generateProblems.multiplication(config.multiplication),
-                ...generateProblems.division(config.division),
-            ];
-
-            if (config.order === 'random') {
-                allProblems.sort(() => 0.5 - Math.random());
-            }
-            
-            const today = new Date();
-            const title = `計算プリント ${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-
-            if(allProblems.length === 0){
-                const canvas = document.getElementById('worksheet-canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.font = '16pt Meiryo';
-                ctx.fillText('問題数を設定してください。', 50, 50);
+            let allProbs = [...generateProblems.addition(cfg.addition), ...generateProblems.subtraction(cfg.subtraction), ...generateProblems.multiplication(cfg.multiplication), ...generateProblems.division(cfg.division)];
+            if(cfg.order==='random'){allProbs.sort(()=>0.5-Math.random())}
+            const today=new Date(), title=`計算プリント ${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
+            if(allProbs.length===0){
+                const cv=document.getElementById('worksheet-canvas'),ctx=cv.getContext('2d');
+                ctx.clearRect(0,0,cv.width,cv.height);ctx.font='16pt Meiryo';
+                ctx.fillText('問題数を設定してください。',50,50);
                 document.getElementById('answer-canvas').getContext('2d').clearRect(0,0,800,1100);
                 return;
             }
-
-            renderToCanvas('worksheet-canvas', title, allProblems, false);
-            renderToCanvas('answer-canvas', `${title} こたえ`, allProblems, true);
+            renderToCanvas('worksheet-canvas',title,allProbs,false);
+            renderToCanvas('answer-canvas',`${title} こたえ`,allProbs,true);
         };
         
-        // --- イベントリスナーの設定 ---
-        const printCanvas = (canvasId) => {
-            const canvas = document.getElementById(canvasId);
-            const dataUrl = canvas.toDataURL('image/png');
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html><head><title>印刷プレビュー</title></head>
-                <body style="text-align:center;"><img src="${dataUrl}" style="width:100%; max-width:800px;"></body>
-                </html>`);
-            printWindow.document.close();
-            printWindow.onload = () => {
-                printWindow.print();
-                printWindow.close();
-            };
+        // --- 合計問題数とアラートの管理 ---
+        const qInputs = document.querySelectorAll('.q-input');
+        const totalCounter = document.getElementById('total-counter');
+        const cuteAlert = document.getElementById('cute-alert');
+        const closeAlertBtn = document.getElementById('close-alert-btn');
+
+        const updateTotal = () => {
+            let total = 0;
+            qInputs.forEach(input => {
+                total += parseInt(input.value, 10) || 0;
+            });
+            totalCounter.textContent = `合計問題数: ${total}問`;
+            if (total > 24) {
+                totalCounter.style.color = 'red';
+                cuteAlert.classList.remove('hidden');
+            } else {
+                totalCounter.style.color = 'black';
+                cuteAlert.classList.add('hidden');
+            }
         };
 
+        qInputs.forEach(input => input.addEventListener('input', updateTotal));
+        closeAlertBtn.addEventListener('click', () => cuteAlert.classList.add('hidden'));
+
+        // --- イベントリスナーの設定 ---
+        const printCanvas = (canvasId) => {
+            const canvas=document.getElementById(canvasId), dataUrl=canvas.toDataURL('image/png');
+            const pWin=window.open('','_blank');
+            pWin.document.write(`<html><head><title>印刷</title></head><body style="text-align:center;"><img src="${dataUrl}" style="width:100%;max-width:800px;"></body></html>`);
+            pWin.document.close();pWin.onload=()=>{pWin.print();pWin.close()};
+        };
         const showCanvas = (canvasId, title) => {
-            const canvas = document.getElementById(canvasId);
-            const dataUrl = canvas.toDataURL('image/png');
-            const viewWindow = window.open('', '_blank');
-            viewWindow.document.write(`
-                <html><head><title>${title}</title></head>
-                <body style="margin:0; text-align:center; background-color: #f0f0f0;">
-                <img src="${dataUrl}" style="max-width:100%; height:auto;"></body>
-                </html>`);
-            viewWindow.document.close();
+            const canvas=document.getElementById(canvasId), dataUrl=canvas.toDataURL('image/png');
+            const vWin=window.open('','_blank');
+            vWin.document.write(`<html><head><title>${title}</title></head><body style="margin:0;text-align:center;background-color:#f0f0f0;"><img src="${dataUrl}" style="max-width:100%;height:auto;"></body></html>`);
+            vWin.document.close();
         };
 
         document.getElementById('generateBtn').addEventListener('click', generateAndRender);
@@ -388,6 +339,7 @@
         document.getElementById('showAnswerBtn').addEventListener('click', () => showCanvas('answer-canvas', '答えの表示'));
         
         // --- 初期表示 ---
+        updateTotal();
         generateAndRender();
     </script>
 </body>
