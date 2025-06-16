@@ -91,7 +91,7 @@
             gap: 10px;
             margin-top: 20px;
         }
-        .actionBtn, .printBtn, #copyIdBtn {
+        .actionBtn, .printBtn {
             width: 100%;
             padding: 12px;
             font-size: 1em;
@@ -101,15 +101,24 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .actionBtn, #copyIdBtn { background-color: #667eea; }
-        .actionBtn:hover, #copyIdBtn:hover { background-color: #5a67d8; }
+        .actionBtn { background-color: #667eea; }
+        .actionBtn:hover { background-color: #5a67d8; }
         .printBtn { background-color: #38a169; }
         .printBtn:hover { background-color: #2f855a; }
-        #loadBtn {
+        #loadBtn, #copyIdBtn {
             font-size: 1em;
             width: auto;
             margin-top: 0;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
         }
+         #loadBtn:hover, #copyIdBtn:hover {
+             background-color: #5a67d8;
+         }
 
 
         canvas {
@@ -119,12 +128,18 @@
             height: auto;
             flex-grow: 1;
         }
-        .info, #generatedIdContainer, .feedback-toast {
+        .info, .feedback-toast {
             background-color: #eef2ff;
             border-left: 5px solid #667eea;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 0 5px 5px 0;
+        }
+        #generatedIdContainer {
+            background-color: #eef2ff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
         }
         
         #cute-alert, .feedback-toast {
@@ -148,7 +163,6 @@
             background-color: #c6f6d5;
             border-color: #68d391;
             color: #2f855a;
-            padding: 15px 30px;
         }
         .feedback-toast.error {
              background-color: #fed7d7;
@@ -254,11 +268,11 @@
         </div>
         
         <div id="total-counter">合計問題数: 10問</div>
-        <button id="generateBtn">計算プリントを作成</button>
+        <button id="generateBtn">計算プリントを<br>作成</button>
         
         <!-- 共有機能セクション -->
         <div id="sharing-section" style="display: none;">
-            <h3 style="margin-top: 30px;">🛜 共有・読み込み</h3>
+            <h3 style="margin-top: 30px;">共有・読み込み</h3>
             <div class="input-group">
                 <label for="printIdInput">IDでプリントを読み込む</label>
                 <div class="input-with-button">
@@ -267,7 +281,7 @@
                 </div>
             </div>
             <div id="generatedIdContainer">
-                <p style="margin: 0; font-weight: bold; font-size: 0.9em;">👇プリントが保存されました！</p>
+                <p style="margin: 0; font-weight: bold; font-size: 0.9em;">プリントが保存されました！</p>
                 <div class="input-with-button" style="margin-top: 5px;">
                     <input type="text" id="generatedId" readonly>
                     <button id="copyIdBtn">コピー</button>
@@ -408,7 +422,7 @@
             if (canvasId === 'worksheet-canvas') {
                 ctx.fillText('なまえ（　　　　　　　　　　　　）', leftColumnX, currentY);
             } else { 
-                ctx.fillText('こたえあわせをしよう。', leftColumnX, currentY);
+                // なにも表示しない
             }
             currentY += lineHeight;
 
@@ -634,7 +648,7 @@
                 console.log("Firebase initialized and authenticated successfully.");
                 
                 document.getElementById('sharing-section').style.display = 'block';
-                document.getElementById('generateBtn').textContent = '計算プリントを作成・保存';
+                document.getElementById('generateBtn').innerHTML = '計算プリントを<br>作成・保存';
 
             } catch (e) {
                 console.error("Firebaseの初期化または認証に失敗しました。共有機能は無効になります。", e);
