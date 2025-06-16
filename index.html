@@ -64,18 +64,14 @@
             margin-bottom: 0;
             font-weight: normal;
         }
-        .input-item input[type="number"], #printIdInput {
+        .input-item input[type="number"] {
             width: 60px;
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ccc;
             text-align: center;
         }
-        #printIdInput {
-            width: auto;
-            flex-grow: 1;
-            text-align: left;
-        }
+
         #generateBtn, #loadBtn {
             width: 100%;
             padding: 12px;
@@ -109,7 +105,12 @@
         .actionBtn:hover, #copyIdBtn:hover { background-color: #5a67d8; }
         .printBtn { background-color: #38a169; }
         .printBtn:hover { background-color: #2f855a; }
-        #loadBtn { font-size: 1em; padding: 8px 12px; width: auto; margin-top: 0;}
+        #loadBtn {
+            font-size: 1em;
+            width: auto;
+            margin-top: 0;
+        }
+
 
         canvas {
             border: 1px solid #ccc;
@@ -126,7 +127,6 @@
             border-radius: 0 5px 5px 0;
         }
         
-        /* --- アラート/トースト用スタイル --- */
         #cute-alert, .feedback-toast {
             position: fixed;
             top: 50%;
@@ -189,6 +189,24 @@
             font-weight: bold;
         }
         #generatedIdContainer { display: none; }
+
+        .input-with-button {
+            display: flex;
+            gap: 5px;
+            align-items: stretch;
+        }
+        .input-with-button input {
+            flex-grow: 1;
+            min-width: 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .input-with-button button {
+            flex-shrink: 0;
+            padding: 8px 12px;
+        }
     </style>
 </head>
 <body>
@@ -204,8 +222,8 @@
         </div>
         <h3>たしざん</h3>
         <div class="input-group">
-            <div class="input-item"><label for="add_ss">ひとけた＋ひとけた</label><input type="number" id="add_ss" class="q-input" min="0" value="4"></div>
-            <div class="input-item"><label for="add_u20s">10から20まで+ひとけた</label><input type="number" id="add_u20s" class="q-input" min="0" value="0"></div>
+            <div class="input-item"><label for="add_ss">ひとけた＋ひとけた</label><input type="number" id="add_ss" class="q-input" min="0" value="2"></div>
+            <div class="input-item"><label for="add_u20s">10から20まで+ひとけた</label><input type="number" id="add_u20s" class="q-input" min="0" value="2"></div>
             <div class="input-item"><label for="add_u40u40">10から40まで+10から40まで</label><input type="number" id="add_u40u40" class="q-input" min="0" value="0"></div>
         </div>
         <h3>ひきざん</h3>
@@ -222,37 +240,37 @@
                 <input type="checkbox" id="table2" value="2" checked><label for="table2" style="display:inline-block; margin-right:5px;">2</label>
                 <input type="checkbox" id="table3" value="3" checked><label for="table3" style="display:inline-block; margin-right:5px;">3</label>
                 <input type="checkbox" id="table4" value="4" checked><label for="table4" style="display:inline-block; margin-right:5px;">4</label>
-                <input type="checkbox" id="table5" value="5" checked><label for="table5" style="display:inline-block; margin-right:5px;">5</label>
-                <input type="checkbox" id="table6" value="6" checked><label for="table6" style="display:inline-block; margin-right:5px;">6</label>
-                <input type="checkbox" id="table7" value="7" checked><label for="table7" style="display:inline-block; margin-right:5px;">7</label>
-                <input type="checkbox" id="table8" value="8" checked><label for="table8" style="display:inline-block; margin-right:5px;">8</label>
-                <input type="checkbox" id="table9" value="9" checked><label for="table9" style="display:inline-block;">9</label>
+                <input type="checkbox" id="table5" value="5"><label for="table5" style="display:inline-block; margin-right:5px;">5</label>
+                <input type="checkbox" id="table6" value="6"><label for="table6" style="display:inline-block; margin-right:5px;">6</label>
+                <input type="checkbox" id="table7" value="7"><label for="table7" style="display:inline-block; margin-right:5px;">7</label>
+                <input type="checkbox" id="table8" value="8"><label for="table8" style="display:inline-block; margin-right:5px;">8</label>
+                <input type="checkbox" id="table9" value="9"><label for="table9" style="display:inline-block;">9</label>
             </div>
         </div>
         <h3>わりざん (あまりなし)</h3>
         <div class="input-group">
-            <div class="input-item"><label for="div_kuku">かけざん九九の範囲内</label><input type="number" id="div_kuku" class="q-input" min="0" value="4"></div>
+            <div class="input-item"><label for="div_kuku">かけざん九九の範囲内</label><input type="number" id="div_kuku" class="q-input" min="0" value="0"></div>
             <div class="input-item"><label for="div_u99s">99まで÷ひとけた</label><input type="number" id="div_u99s" class="q-input" min="0" value="0"></div>
         </div>
         
-        <div id="total-counter">合計問題数: 16問</div>
+        <div id="total-counter">合計問題数: 10問</div>
         <button id="generateBtn">計算プリントを作成</button>
         
-        <!-- 共有機能セクション (Firebase接続後に表示) -->
+        <!-- 共有機能セクション -->
         <div id="sharing-section" style="display: none;">
             <h3 style="margin-top: 30px;">🛜 共有・読み込み</h3>
             <div class="input-group">
                 <label for="printIdInput">IDでプリントを読み込む</label>
-                <div style="display: flex; gap: 5px;">
+                <div class="input-with-button">
                     <input type="text" id="printIdInput" placeholder="プリントIDを入力">
                     <button id="loadBtn">読込</button>
                 </div>
             </div>
             <div id="generatedIdContainer">
                 <p style="margin: 0; font-weight: bold; font-size: 0.9em;">👇プリントが保存されました！</p>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-                    <input type="text" id="generatedId" readonly style="flex-grow: 1; padding: 5px; border: 1px solid #ccc; background-color: #fff;">
-                    <button id="copyIdBtn" style="padding: 5px 10px; font-size: 0.9em;">コピー</button>
+                <div class="input-with-button" style="margin-top: 5px;">
+                    <input type="text" id="generatedId" readonly>
+                    <button id="copyIdBtn">コピー</button>
                 </div>
                 <p style="font-size: 0.8em; color: #555; margin-top: 8px;">このIDを他の端末で入力すると、同じ問題を表示できます。</p>
             </div>
@@ -279,49 +297,38 @@
         </div>
     </div>
     
-    <!-- アラート用HTML -->
     <div id="cute-alert" class="hidden">
         <p>もんだいが おおすぎるみたい！<br><span style="font-size: 0.8em;">(合計16問までにしてね)</span></p>
         <button id="close-alert-btn">OK</button>
     </div>
 
-    <!-- フィードバック用トースト -->
     <div id="feedback-toast" class="feedback-toast toast-hidden"><p></p></div>
 
-    <!-- ★★★ START: ここからが書き換える部分 ★★★ -->
     <script>
-        // STEP 5.1: ここにFirebaseからコピーした自分の接続情報を貼り付けます
         const __firebase_config = JSON.stringify({
             apiKey: "AIzaSyDviHZQARyEpYyM0ldhGnpFFRwIOVxDTQc",
             authDomain: "keisan-8f7b5.firebaseapp.com",
             projectId: "keisan-8f7b5",
-            storageBucket: "keisan-8f7b5.appspot.com", // storageBucketは.appspot.comで終わることが多いため、念のため修正
+            storageBucket: "keisan-8f7b5.appspot.com",
             messagingSenderId: "612412170755",
             appId: "1:612412170755:web:d8c3c68ca8a6d5fedee436"
         });
-
-        // STEP 5.2: 任意のアプリIDを設定します (データベースの保存場所を区別するため)
-        const __app_id = 'keisan-print-github'; // このままでも、好きなIDに変えてもOK
-
-        // この変数は、古いコードとの互換性のために残します
+        const __app_id = 'keisan-print-github';
         const __initial_auth_token = '';
     </script>
-    <!-- ★★★ END: ここまでが書き換える部分 ★★★ -->
 
 
     <script type="module">
-        // --- Firebaseの初期化と認証 ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
         
         let db, auth;
-        let isAuthReady = false; // 認証状態を管理するフラグ
+        let isAuthReady = false;
 
         const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'default-app';
         const PRINTS_COLLECTION_PATH = `/artifacts/${APP_ID}/public/data/prints`;
 
-        // --- 問題生成関数群 (変更なし) ---
         const generateProblems = {
             addition: (options) => {
                 let problems = [];
@@ -383,7 +390,6 @@
             }
         };
 
-        // --- Canvas描画関数 ---
         const renderToCanvas = (canvasId, title, problemList, showAnswers) => {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
@@ -398,10 +404,13 @@
 
             ctx.fillText(title, leftColumnX, currentY);
             currentY += lineHeight;
+
             if (canvasId === 'worksheet-canvas') {
                 ctx.fillText('なまえ（　　　　　　　　　　　　）', leftColumnX, currentY);
-                currentY += lineHeight;
+            } else { 
+                ctx.fillText('こたえあわせをしよう。', leftColumnX, currentY);
             }
+            currentY += lineHeight;
 
             for (let i = 0; i < problemList.length; i += 2) {
                 const p1 = problemList[i];
@@ -417,7 +426,6 @@
             }
         };
 
-        // --- 問題生成と保存、描画のメイン関数 ---
         const generateAndRender = async () => {
             const getInputValue = (id) => parseInt(document.getElementById(id).value, 10) || 0;
             const getCheckedValues = (containerId) => Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(el => parseInt(el.value, 10));
@@ -443,7 +451,7 @@
 
             const totalCount = allProblems.length;
              if (totalCount > 16) {
-                return; // アラートが表示されているので何もしない
+                return;
             }
             
             const today = new Date();
@@ -461,7 +469,6 @@
             renderToCanvas('worksheet-canvas', title, allProblems, false);
             renderToCanvas('answer-canvas', `${title} こたえ`, allProblems, true);
 
-            // --- Firestoreに保存 (認証後のみ実行) ---
             if (db && isAuthReady) {
                 try {
                     const docData = {
@@ -483,7 +490,6 @@
             }
         };
 
-        // --- IDから問題を読み込んで描画する関数 ---
         const loadAndRender = async () => {
             const printId = document.getElementById('printIdInput').value.trim();
             if (!printId) {
@@ -516,7 +522,6 @@
             }
         };
         
-        // --- UI管理 ---
         const qInputs = document.querySelectorAll('.q-input');
         const totalCounter = document.getElementById('total-counter');
         const cuteAlert = document.getElementById('cute-alert');
@@ -545,33 +550,38 @@
                 feedbackToast.classList.add('toast-hidden');
             }, 3000);
         };
-
+        
         const copyToClipboard = (text) => {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = 0;
+            textArea.style.left = 0;
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = 0;
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) {
                     showToast('IDをコピーしました！', 'success');
-                }).catch(err => {
-                    console.error('クリップボードへのコピーに失敗:', err);
+                } else {
                     showToast('コピーに失敗しました。', 'error');
-                });
-            } else { // フォールバック
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast('IDをコピーしました！', 'success');
-                } catch (err) {
-                    console.error('フォールバックコピーに失敗:', err);
-                    showToast('コピーに失敗しました。', 'error');
+                    console.error('Fallback: Copying text command was unsuccessful');
                 }
-                document.body.removeChild(textArea);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                showToast('コピーに失敗しました。', 'error');
             }
+            document.body.removeChild(textArea);
         };
         
-        // --- イベントリスナー設定 ---
         const printCanvas = (canvasId) => {
              const canvas = document.getElementById(canvasId);
              const dataUrl = canvas.toDataURL('image/png');
@@ -603,12 +613,10 @@
         document.querySelectorAll('#mul_tables input').forEach(cb => cb.addEventListener('change', updateTotal));
         closeAlertBtn.addEventListener('click', () => cuteAlert.classList.add('hidden'));
 
-        // --- 初期化と認証の実行 ---
         async function initializeFirebaseAndAuth() {
-            // グローバル変数が存在するかどうかを安全にチェック
             if (typeof __firebase_config === 'undefined' || typeof __app_id === 'undefined') {
                 console.log("Firebase config not found. Running in offline mode.");
-                return; // 共有機能なしで終了
+                return;
             }
 
             try {
@@ -617,7 +625,6 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // 提供されたトークンでサインインするか、匿名でサインインする
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -626,22 +633,17 @@
                 isAuthReady = true;
                 console.log("Firebase initialized and authenticated successfully.");
                 
-                // 認証成功時のUI更新
                 document.getElementById('sharing-section').style.display = 'block';
                 document.getElementById('generateBtn').textContent = '計算プリントを作成・保存';
 
             } catch (e) {
                 console.error("Firebaseの初期化または認証に失敗しました。共有機能は無効になります。", e);
-                // 共有機能のUIはデフォルトで非表示のままになる
             }
         }
 
-        // --- アプリケーションの開始 ---
         async function startApp() {
             updateTotal();
-            // Firebaseの初期化を試みる
             await initializeFirebaseAndAuth();
-            // 初期問題を描画する（Firebaseが有効なら保存も試みる）
             await generateAndRender(); 
         }
 
