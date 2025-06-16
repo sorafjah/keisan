@@ -584,8 +584,13 @@
 
         // --- 初期化と認証の実行 ---
         async function initializeFirebaseAndAuth() {
+            // グローバル変数が存在するかどうかを安全にチェック
+            if (typeof __firebase_config === 'undefined' || typeof __app_id === 'undefined') {
+                console.log("Firebase config not found. Running in offline mode.");
+                return; // 共有機能なしで終了
+            }
+
             try {
-                // Canvas環境から提供されるFirebase設定を使用
                 const firebaseConfig = JSON.parse(__firebase_config);
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
@@ -604,20 +609,22 @@
                 document.getElementById('sharing-section').style.display = 'block';
                 document.getElementById('generateBtn').textContent = '計算プリントを作成・保存';
 
-                // 認証後に初期データを生成・描画
-                await generateAndRender();
-
             } catch (e) {
                 console.error("Firebaseの初期化または認証に失敗しました。共有機能は無効になります。", e);
-                // 共有機能のUIはデフォルトで非表示のため、ここでは何もしません
-                // フォールバックとしてローカル機能のみで初期描画
-                await generateAndRender(); 
+                // 共有機能のUIはデフォルトで非表示のままになる
             }
         }
 
-        // --- 初期表示 ---
-        updateTotal();
-        initializeFirebaseAndAuth(); // 認証を開始し、その後で初期問題を描画
+        // --- アプリケーションの開始 ---
+        async function startApp() {
+            updateTotal();
+            // Firebaseの初期化を試みる
+            await initializeFirebaseAndAuth();
+            // 初期問題を描画する（Firebaseが有効なら保存も試みる）
+            await generateAndRender(); 
+        }
+
+        startApp();
 
     </script>
 </body>
