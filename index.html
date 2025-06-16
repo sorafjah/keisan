@@ -238,7 +238,7 @@
         <div id="total-counter">合計問題数: 16問</div>
         <button id="generateBtn">計算プリントを作成</button>
         
-        <!-- NEW: 共有機能セクション (デフォルトで非表示) -->
+        <!-- 共有機能セクション (Firebase接続後に表示) -->
         <div id="sharing-section" style="display: none;">
             <h3 style="margin-top: 30px;">🛜 共有・読み込み</h3>
             <div class="input-group">
@@ -288,11 +288,32 @@
     <!-- フィードバック用トースト -->
     <div id="feedback-toast" class="feedback-toast toast-hidden"><p></p></div>
 
+    <!-- ★★★ START: ここからが書き換える部分 ★★★ -->
+    <script>
+        // STEP 5.1: ここにFirebaseからコピーした自分の接続情報を貼り付けます
+        const __firebase_config = JSON.stringify({
+            apiKey: "AIzaSyDviHZQARyEpYyM0ldhGnpFFRwIOVxDTQc",
+            authDomain: "keisan-8f7b5.firebaseapp.com",
+            projectId: "keisan-8f7b5",
+            storageBucket: "keisan-8f7b5.appspot.com", // storageBucketは.appspot.comで終わることが多いため、念のため修正
+            messagingSenderId: "612412170755",
+            appId: "1:612412170755:web:d8c3c68ca8a6d5fedee436"
+        });
+
+        // STEP 5.2: 任意のアプリIDを設定します (データベースの保存場所を区別するため)
+        const __app_id = 'keisan-print-github'; // このままでも、好きなIDに変えてもOK
+
+        // この変数は、古いコードとの互換性のために残します
+        const __initial_auth_token = '';
+    </script>
+    <!-- ★★★ END: ここまでが書き換える部分 ★★★ -->
+
+
     <script type="module">
         // --- Firebaseの初期化と認証 ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
         
         let db, auth;
         let isAuthReady = false; // 認証状態を管理するフラグ
