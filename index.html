@@ -194,7 +194,7 @@
 <body>
 
     <div id="sidebar">
-        <!-- 問題設定UI（変更なし） -->
+        <!-- 問題設定UI -->
         <h3 style="margin-top: 0;">出題順</h3>
         <div class="input-group">
             <input type="radio" id="order-sequential" name="order" value="sequential" checked>
@@ -236,24 +236,26 @@
         </div>
         
         <div id="total-counter">合計問題数: 16問</div>
-        <button id="generateBtn">計算プリントを作成・保存</button>
+        <button id="generateBtn">計算プリントを作成</button>
         
-        <!-- NEW: 保存と共有機能 -->
-        <h3 style="margin-top: 30px;">🛜 共有・読み込み</h3>
-        <div class="input-group">
-            <label for="printIdInput">IDでプリントを読み込む</label>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="printIdInput" placeholder="プリントIDを入力">
-                <button id="loadBtn">読込</button>
+        <!-- NEW: 共有機能セクション (デフォルトで非表示) -->
+        <div id="sharing-section" style="display: none;">
+            <h3 style="margin-top: 30px;">🛜 共有・読み込み</h3>
+            <div class="input-group">
+                <label for="printIdInput">IDでプリントを読み込む</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="printIdInput" placeholder="プリントIDを入力">
+                    <button id="loadBtn">読込</button>
+                </div>
             </div>
-        </div>
-        <div id="generatedIdContainer">
-            <p style="margin: 0; font-weight: bold; font-size: 0.9em;">👇プリントが保存されました！</p>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-                <input type="text" id="generatedId" readonly style="flex-grow: 1; padding: 5px; border: 1px solid #ccc; background-color: #fff;">
-                <button id="copyIdBtn" style="padding: 5px 10px; font-size: 0.9em;">コピー</button>
+            <div id="generatedIdContainer">
+                <p style="margin: 0; font-weight: bold; font-size: 0.9em;">👇プリントが保存されました！</p>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                    <input type="text" id="generatedId" readonly style="flex-grow: 1; padding: 5px; border: 1px solid #ccc; background-color: #fff;">
+                    <button id="copyIdBtn" style="padding: 5px 10px; font-size: 0.9em;">コピー</button>
+                </div>
+                <p style="font-size: 0.8em; color: #555; margin-top: 8px;">このIDを他の端末で入力すると、同じ問題を表示できます。</p>
             </div>
-            <p style="font-size: 0.8em; color: #555; margin-top: 8px;">このIDを他の端末で入力すると、同じ問題を表示できます。</p>
         </div>
     </div>
 
@@ -290,7 +292,7 @@
         // --- Firebaseの初期化と認証 ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         let db, auth;
         let isAuthReady = false; // 認証状態を管理するフラグ
@@ -420,8 +422,7 @@
 
             const totalCount = allProblems.length;
              if (totalCount > 16) {
-                // アラートが表示されているので何もしない
-                return;
+                return; // アラートが表示されているので何もしない
             }
             
             const today = new Date();
@@ -439,7 +440,7 @@
             renderToCanvas('worksheet-canvas', title, allProblems, false);
             renderToCanvas('answer-canvas', `${title} こたえ`, allProblems, true);
 
-            // --- NEW: Firestoreに保存 (認証後のみ実行) ---
+            // --- Firestoreに保存 (認証後のみ実行) ---
             if (db && isAuthReady) {
                 try {
                     const docData = {
@@ -461,7 +462,7 @@
             }
         };
 
-        // --- NEW: IDから問題を読み込んで描画する関数 ---
+        // --- IDから問題を読み込んで描画する関数 ---
         const loadAndRender = async () => {
             const printId = document.getElementById('printIdInput').value.trim();
             if (!printId) {
@@ -550,8 +551,24 @@
         };
         
         // --- イベントリスナー設定 ---
-        const printCanvas = (canvasId) => { /* ... (変更なし) ... */ };
-        const showCanvas = (canvasId, title) => { /* ... (変更なし) ... */ };
+        const printCanvas = (canvasId) => {
+             const canvas = document.getElementById(canvasId);
+             const dataUrl = canvas.toDataURL('image/png');
+             const printWindow = window.open('', '_blank');
+             printWindow.document.write(`<html><head><title>印刷</title></head><body style="text-align:center;"><img src="${dataUrl}" style="width:100%;max-width:800px;"></body></html>`);
+             printWindow.document.close();
+             printWindow.onload = () => {
+                 printWindow.print();
+                 printWindow.close();
+             };
+        };
+        const showCanvas = (canvasId, title) => {
+             const canvas = document.getElementById(canvasId);
+             const dataUrl = canvas.toDataURL('image/png');
+             const viewWindow = window.open('', '_blank');
+             viewWindow.document.write(`<html><head><title>${title}</title></head><body style="margin:0;text-align:center;background-color:#f0f0f0;"><img src="${dataUrl}" style="max-width:100%;height:auto;"></body></html>`);
+             viewWindow.document.close();
+        };
 
         document.getElementById('generateBtn').addEventListener('click', generateAndRender);
         document.getElementById('loadBtn').addEventListener('click', loadAndRender);
@@ -573,7 +590,6 @@
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-                setLogLevel('debug');
 
                 // 提供されたトークンでサインインするか、匿名でサインインする
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -584,15 +600,17 @@
                 isAuthReady = true;
                 console.log("Firebase initialized and authenticated successfully.");
                 
+                // 認証成功時のUI更新
+                document.getElementById('sharing-section').style.display = 'block';
+                document.getElementById('generateBtn').textContent = '計算プリントを作成・保存';
+
                 // 認証後に初期データを生成・描画
                 await generateAndRender();
 
             } catch (e) {
-                console.error("Firebaseの初期化または認証に失敗しました。", e);
-                const shareSection = document.querySelector('h3 + .input-group > label[for="printIdInput"]');
-                if(shareSection) shareSection.closest('.input-group').parentElement.style.display = 'none';
-                
-                // 認証なしでもローカル機能は使えるように初期描画
+                console.error("Firebaseの初期化または認証に失敗しました。共有機能は無効になります。", e);
+                // 共有機能のUIはデフォルトで非表示のため、ここでは何もしません
+                // フォールバックとしてローカル機能のみで初期描画
                 await generateAndRender(); 
             }
         }
